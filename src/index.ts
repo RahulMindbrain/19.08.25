@@ -33,3 +33,8 @@ app.use('/subject', SubjectRouter)
 app.listen(8080,()=>{
     console.log("http://localhost:8080/");
 })
+
+
+import UsersRouter from './users/users.routes'
+
+app.use('/users', UsersRouter)

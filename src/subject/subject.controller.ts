@@ -4,6 +4,40 @@ import { SubjectDoc } from './subject.model';
 import { Request, Response } from 'express'
 
 
+
+export const getSubject = async(req:Request,res:Response)=>{
+
+  //class id so that we could know which class subject we are talking about
+  const cid=req.params.id;
+  const tenantToken = req.cookies?.TenantToken;
+
+  //tenant id 
+  const Tid = await TenantModel.findOne({tenantToken});
+
+  //does tenant id exist in the tenant model 
+  const isExist = await TenantModel.findById(Tid?._id);
+
+  if(!isExist){
+    return res.status(200).json({message:"Please Enter a valid Tenant id"});
+  }
+
+
+  //subjects filtering with multiple parameters 
+
+  const subjects = await SubjectModel.find({
+       tenantId:Tid,
+        classIds:cid
+  }).limit(5);
+
+  res.status(200).json({
+      message: "Subjects fetched successfully",
+      data: subjects,
+    });
+
+
+}
+
+
 export const setSubject = async(req: Request, res: Response):Promise<any>=>{
 
 	const body = req.body;

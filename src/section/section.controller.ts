@@ -3,6 +3,41 @@ import SectionModel from './section.model'
 import { Request, Response } from 'express'
 import { SectionDoc } from './section.model';
 
+
+
+export const getSection = async(req:Request,res:Response)=>{
+
+  //class id so that we could know which class subject we are talking about
+  const cid=req.params.id;
+  const tenantToken = req.cookies?.TenantToken;
+
+  //tenant id 
+  const Tid = await TenantModel.findOne({tenantToken});
+
+  //does tenant id exist in the tenant model 
+  const isExist = await TenantModel.findById(Tid?._id);
+
+  if(!isExist){
+    return res.status(200).json({message:"Please Enter a valid Tenant id"});
+  }
+
+
+  //section filtering with multiple parameters 
+
+  const sections = await SectionModel.find({
+       tenantId:Tid,
+        classIds:cid
+  }).limit(5);
+
+  res.status(200).json({
+      message: "Subjects fetched successfully",
+      data: sections,
+    });
+
+
+}
+
+
 export const setSection = async(req: Request, res: Response):Promise<any>=>{
 
 	const body = req.body;
@@ -54,7 +89,7 @@ export const updateSection = async (req: Request, res: Response): Promise<any> =
 };
 
 
-export const deleteSubject = async (req: Request, res: Response): Promise<any> => {
+export const deleteSection = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;//should be section id
     const tenantToken = req.cookies?.TenantToken;
@@ -71,7 +106,7 @@ export const deleteSubject = async (req: Request, res: Response): Promise<any> =
 
   
     const deletedSection = await SectionModel.findOneAndDelete({
-      _id: id,
+        classId:id,
       tenantId: tenant._id
     });
 
